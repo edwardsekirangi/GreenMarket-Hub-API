@@ -23,7 +23,7 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/products", productRoutes);
-app.use("shops", shopRoutes);
+app.use("/shops", shopRoutes);
 
 // Swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
