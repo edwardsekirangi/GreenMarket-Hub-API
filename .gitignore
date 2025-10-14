@@ -140,3 +140,6 @@ vite.config.ts.timestamp-*
 
 #pnpm files
 pnpm-lock.yaml
+
+GreenMarket-Hub-API-output.md
+GreenMarket-Hub-API-output.txt

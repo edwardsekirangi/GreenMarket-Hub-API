@@ -1,5 +1,7 @@
 // This is where the mongoDB database will be connected
 const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const connectDB = async () => {
     try {
