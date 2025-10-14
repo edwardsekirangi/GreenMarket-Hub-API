@@ -10,7 +10,7 @@ const swaggerDocument = {
   },
   servers: [
     { url: "http://localhost:3000", description: "Development server" },
-    { url: "https://greenmarket-hub.onrender.com", description: "Production server" },
+    { url: "https://greenmarket-hub-api.onrender.com", description: "Production server" },
   ],
   tags: [
     { name: "Products", description: "Product management" },
