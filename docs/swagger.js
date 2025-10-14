@@ -6,45 +6,48 @@ const swaggerDocument = {
   info: {
     title: "GreenMarket Hub API",
     version: "1.0.0",
-    description: "API documentation for the GreenMarket Hub community marketplace. Endpoints are grouped by resource (Products, Shops, etc.).",
+    description: "API documentation for Products and Shops",
   },
   servers: [
-    {
-      url: "http://localhost:4800",
-      description: "Development server (local)",
-    },
-    {
-      url: "https://greenmarket-hub-api.onrender.com",
-      description: "Production server (Render deployment)",
-    },
+    { url: "http://localhost:3000", description: "Development server" },
+    { url: "https://greenmarket-hub.onrender.com", description: "Production server" },
   ],
   tags: [
-    {
-      name: "Products",
-      description: "Operations related to product management",
-    },
-    {
-      name: "Shops",
-      description: "Operations related to shop management",
-    },
+    { name: "Products", description: "Product management" },
+    { name: "Shops", description: "Shop management" },
   ],
   paths: {
     "/products": {
       get: {
         tags: ["Products"],
         summary: "List all products",
-        responses: {
-          200: { description: "Array of products" },
-          500: { description: "Server error" },
-        },
+        responses: { 200: { description: "Array of products" } },
       },
       post: {
         tags: ["Products"],
         summary: "Create a new product",
-        responses: {
-          201: { description: "Product created" },
-          400: { description: "Validation error" },
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["shopId", "name", "price"],
+                properties: {
+                  shopId: { type: "string", description: "ID of the shop" },
+                  name: { type: "string" },
+                  desc: { type: "string" },
+                  price: { type: "number", minimum: 0 },
+                  currency: { type: "string", example: "USD" },
+                  stock: { type: "integer", minimum: 0 },
+                  tags: { type: "array", items: { type: "string" } },
+                  images: { type: "array", items: { type: "string" } },
+                },
+              },
+            },
+          },
         },
+        responses: { 201: { description: "Product created" }, 400: { description: "Validation error" } },
       },
     },
     "/products/{id}": {
@@ -52,28 +55,36 @@ const swaggerDocument = {
         tags: ["Products"],
         summary: "Get product by ID",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
-        responses: {
-          200: { description: "Product found" },
-          404: { description: "Not found" },
-        },
+        responses: { 200: { description: "Product found" }, 404: { description: "Not found" } },
       },
       put: {
         tags: ["Products"],
         summary: "Update product by ID",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
-        responses: {
-          200: { description: "Product updated" },
-          400: { description: "Validation error" },
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  desc: { type: "string" },
+                  price: { type: "number" },
+                  stock: { type: "integer" },
+                  status: { type: "string", enum: ["active", "archived"] },
+                },
+              },
+            },
+          },
         },
+        responses: { 200: { description: "Product updated" }, 400: { description: "Validation error" } },
       },
       delete: {
         tags: ["Products"],
         summary: "Delete product by ID",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
-        responses: {
-          204: { description: "Deleted" },
-          404: { description: "Not found" },
-        },
+        responses: { 204: { description: "Deleted" }, 404: { description: "Not found" } },
       },
     },
     "/shops": {
@@ -85,36 +96,59 @@ const swaggerDocument = {
       post: {
         tags: ["Shops"],
         summary: "Create a new shop",
-        responses: { 201: { description: "Shop created" } },
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["ownerId", "name", "contactEmail"],
+                properties: {
+                  ownerId: { type: "string" },
+                  name: { type: "string" },
+                  bio: { type: "string" },
+                  logoUrl: { type: "string" },
+                  contactEmail: { type: "string", format: "email" },
+                  location: { type: "string" },
+                  isVerified: { type: "boolean" },
+                },
+              },
+            },
+          },
+        },
+        responses: { 201: { description: "Shop created" }, 400: { description: "Validation error" } },
       },
     },
     "/shops/{id}": {
-      get: {
-        tags: ["Shops"],
-        summary: "Get shop by ID",
-        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
-        responses: {
-          200: { description: "Shop found" },
-          404: { description: "Not found" },
-        },
-      },
       put: {
         tags: ["Shops"],
         summary: "Update shop by ID",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
-        responses: {
-          200: { description: "Shop updated" },
-          400: { description: "Validation error" },
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  bio: { type: "string" },
+                  logoUrl: { type: "string" },
+                  contactEmail: { type: "string" },
+                  location: { type: "string" },
+                  isVerified: { type: "boolean" },
+                },
+              },
+            },
+          },
         },
+        responses: { 200: { description: "Shop updated" }, 400: { description: "Validation error" } },
       },
       delete: {
         tags: ["Shops"],
         summary: "Delete shop by ID",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
-        responses: {
-          204: { description: "Deleted" },
-          404: { description: "Not found" },
-        },
+        responses: { 204: { description: "Deleted" }, 404: { description: "Not found" } },
       },
     },
   },
