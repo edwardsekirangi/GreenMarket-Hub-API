@@ -14,7 +14,7 @@ const swaggerDocument = {
       description: "Development server (local)",
     },
     {
-      url: "https://greenmarket-hub.onrender.com",
+      url: "https://greenmarket-hub-api.onrender.com",
       description: "Production server (Render deployment)",
     },
   ],
