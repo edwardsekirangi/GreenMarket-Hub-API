@@ -1,4 +1,3 @@
-// docs/swagger.js
 const swaggerUi = require("swagger-ui-express");
 
 const swaggerDocument = {
@@ -22,6 +21,8 @@ const swaggerDocument = {
   tags: [
     { name: "Products", description: "Operations related to product management" },
     { name: "Shops", description: "Operations related to shop management" },
+    { name: "Orders", description: "Operations related to order management" },
+    { name: "Reviews", description: "Operations related to review management" },
   ],
   paths: {
     // ---------------- PRODUCTS ----------------
@@ -205,9 +206,191 @@ const swaggerDocument = {
         },
       },
     },
-  },
 
-  // ---------------- COMPONENT SCHEMAS ----------------
+    // ---------------- ORDERS ----------------
+    "/orders": {
+      get: {
+        tags: ["Orders"],
+        summary: "List all orders",
+        responses: {
+          200: { description: "Array of orders" },
+          500: { description: "Server error" },
+        },
+      },
+      post: {
+        tags: ["Orders"],
+        summary: "Create a new order (requires auth)",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/OrderInput" },
+            },
+          },
+        },
+        responses: {
+          201: { description: "Order created" },
+          400: { description: "Validation error" },
+          401: { description: "Unauthorized" },
+        },
+      },
+    },
+    "/orders/{id}": {
+      get: {
+        tags: ["Orders"],
+        summary: "Get order by ID",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+            description: "The ID of the order",
+          },
+        ],
+        responses: {
+          200: { description: "Order found" },
+          404: { description: "Not found" },
+        },
+      },
+      put: {
+        tags: ["Orders"],
+        summary: "Update order by ID (requires auth)",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+            description: "The ID of the order to update",
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/OrderUpdate" },
+            },
+          },
+        },
+        responses: {
+          200: { description: "Order updated" },
+          400: { description: "Validation error" },
+          404: { description: "Not found" },
+          401: { description: "Unauthorized" },
+        },
+      },
+      delete: {
+        tags: ["Orders"],
+        summary: "Delete order by ID",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+            description: "The ID of the order to delete",
+          },
+        ],
+        responses: {
+          204: { description: "Deleted" },
+          404: { description: "Not found" },
+        },
+      },
+    },
+
+    // ---------------- REVIEWS ----------------
+    "/reviews": {
+      get: {
+        tags: ["Reviews"],
+        summary: "List all reviews",
+        responses: {
+          200: { description: "Array of reviews" },
+          500: { description: "Server error" },
+        },
+      },
+      post: {
+        tags: ["Reviews"],
+        summary: "Create a new review (requires auth)",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/ReviewInput" },
+            },
+          },
+        },
+        responses: {
+          201: { description: "Review created" },
+          400: { description: "Validation error" },
+          401: { description: "Unauthorized" },
+        },
+      },
+    },
+    "/reviews/{id}": {
+      get: {
+        tags: ["Reviews"],
+        summary: "Get review by ID",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+            description: "The ID of the review",
+          },
+        ],
+        responses: {
+          200: { description: "Review found" },
+          404: { description: "Not found" },
+        },
+      },
+      put: {
+        tags: ["Reviews"],
+        summary: "Update review by ID (requires auth)",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+            description: "The ID of the review to update",
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/ReviewUpdate" },
+            },
+          },
+        },
+        responses: {
+          200: { description: "Review updated" },
+          400: { description: "Validation error" },
+          404: { description: "Not found" },
+          401: { description: "Unauthorized" },
+        },
+      },
+      delete: {
+        tags: ["Reviews"],
+        summary: "Delete review by ID",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+            description: "The ID of the review to delete",
+          },
+        ],
+        responses: {
+          204: { description: "Deleted" },
+          404: { description: "Not found" },
+        },
+      },
+    },
+  },
   components: {
     schemas: {
       ProductInput: {
@@ -257,6 +440,63 @@ const swaggerDocument = {
           contactEmail: { type: "string", format: "email" },
           location: { type: "string" },
           isVerified: { type: "boolean" },
+        },
+      },
+      OrderInput: {
+        type: "object",
+        required: ["userId", "products", "total"],
+        properties: {
+          userId: { type: "string" },
+          products: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                productId: { type: "string" },
+                quantity: { type: "integer", minimum: 1 },
+              },
+            },
+          },
+          total: { type: "number", minimum: 0 },
+          status: {
+            type: "string",
+            enum: ["pending", "paid", "shipped"],
+            default: "pending",
+          },
+        },
+      },
+      OrderUpdate: {
+        type: "object",
+        properties: {
+          products: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                productId: { type: "string" },
+                quantity: { type: "integer", minimum: 1 },
+              },
+            },
+          },
+          total: { type: "number" },
+          status: { type: "string", enum: ["pending", "paid", "shipped"] },
+        },
+      },
+      ReviewInput: {
+        type: "object",
+        required: ["productId", "userId", "rating"],
+        properties: {
+          productId: { type: "string" },
+          userId: { type: "string" },
+          rating: { type: "integer", minimum: 1, maximum: 5 },
+          comment: { type: "string" },
+        },
+      },
+      ReviewUpdate: {
+        type: "object",
+        properties: {
+          rating: { type: "integer", minimum: 1, maximum: 5 },
+          comment: { type: "string" },
         },
       },
     },
